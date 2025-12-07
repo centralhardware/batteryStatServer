@@ -100,8 +100,7 @@ export PORT=8080
 {
   "deviceId": "ABC123-DEF456-GHI789",
   "cycleCount": 123,
-  "healthPercent": 94,
-  "manufactureDate": "2022-01-15"
+  "healthPercent": 94
 }
 ```
 

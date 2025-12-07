@@ -44,8 +44,7 @@ curl http://localhost:8080/api/battery/healthcheck
 {
   "deviceId": "ABC123...",     // Обязательно: уникальный ID устройства
   "cycleCount": 123,           // Обязательно: количество циклов зарядки
-  "healthPercent": 94,         // Обязательно: процент здоровья батареи (из системы)
-  "manufactureDate": "2022-01-15"  // Опционально: дата производства
+  "healthPercent": 94          // Обязательно: процент здоровья батареи (из системы)
 }
 ```
 
@@ -56,7 +55,6 @@ curl http://localhost:8080/api/battery/healthcheck
 | `deviceId` | String | Yes | Уникальный идентификатор устройства (Hardware UUID) |
 | `cycleCount` | Integer | Yes | Количество полных циклов зарядки батареи |
 | `healthPercent` | Integer | Yes | Процент здоровья батареи (из System Information) |
-| `manufactureDate` | String | No | Дата производства батареи |
 
 **Response:**
 
@@ -73,28 +71,13 @@ curl http://localhost:8080/api/battery/healthcheck
 
 **Examples:**
 
-#### Full data:
-
 ```bash
 curl -X POST http://localhost:8080/api/battery/health \
   -H "Content-Type: application/json" \
   -d '{
     "deviceId": "ABC123-DEF456-GHI789",
     "cycleCount": 123,
-    "healthPercent": 94,
-    "manufactureDate": "2022-01-15"
-  }'
-```
-
-#### Minimal data (only required fields):
-
-```bash
-curl -X POST http://localhost:8080/api/battery/health \
-  -H "Content-Type: application/json" \
-  -d '{
-    "deviceId": "ABC123-DEF456-GHI789",
-    "cycleCount": 456,
-    "healthPercent": 90
+    "healthPercent": 94
   }'
 ```
 

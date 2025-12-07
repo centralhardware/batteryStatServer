@@ -24,21 +24,18 @@ class BatteryRepository(clickhouseUrl: String) {
                         date_time,
                         device_id,
                         cycle_count,
-                        health_percent,
-                        manufacture_date
+                        health_percent
                     ) VALUES (
                         toDateTime(?),
                         toString(?),
                         toUInt32(?),
-                        toUInt8(?),
-                        toString(?)
+                        toUInt8(?)
                     )
                     """.trimIndent(),
                     Timestamp.valueOf(health.dateTime),
                     health.deviceId,
                     health.cycleCount,
-                    health.healthPercent,
-                    health.manufactureDate
+                    health.healthPercent
                 ).asUpdate
             )
 

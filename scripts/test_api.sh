@@ -35,8 +35,7 @@ echo "POST $SERVER_URL/api/battery/health"
 TEST_DATA='{
   "deviceId": "test-device-001",
   "cycleCount": 123,
-  "healthPercent": 96,
-  "manufactureDate": "2022-01-15"
+  "healthPercent": 96
 }'
 
 echo "Request body:"

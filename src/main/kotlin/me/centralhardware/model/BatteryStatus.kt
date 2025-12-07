@@ -7,14 +7,12 @@ import java.time.LocalDateTime
 data class BatteryHealthRequest(
     val deviceId: String,
     val cycleCount: Int,
-    val healthPercent: Int,
-    val manufactureDate: String? = null
+    val healthPercent: Int
 )
 
 data class BatteryHealth(
     val dateTime: LocalDateTime,
     val deviceId: String,
     val cycleCount: Int,
-    val healthPercent: Int,
-    val manufactureDate: String?
+    val healthPercent: Int
 )

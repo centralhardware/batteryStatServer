@@ -4,21 +4,21 @@
 # This script collects battery health information and sends it to the server
 
 # Configuration
-SERVER_URL="${BATTERY_SERVER_URL:-http://localhost:8080}"
+SERVER_URL="${BATTERY_SERVER_URL:-http://10.168.0.77:8321}"
 ENDPOINT="/api/battery/health"
 
 # Get device ID (hardware UUID)
-DEVICE_ID=$(ioreg -rd1 -c IOPlatformExpertDevice | awk '/IOPlatformUUID/ { print $3; }' | tr -d '"')
+DEVICE_ID=$(/usr/sbin/ioreg -rd1 -c IOPlatformExpertDevice | /usr/bin/awk '/IOPlatformUUID/ { print $3; }' | tr -d '"')
 
 # Get battery information using ioreg
-IOREG_DATA=$(ioreg -r -c AppleSmartBattery)
+IOREG_DATA=$(/usr/sbin/ioreg -r -c AppleSmartBattery)
 
 # Extract values
-CYCLE_COUNT=$(echo "$IOREG_DATA" | grep '"CycleCount" =' | awk '{print $3}')
-MANUFACTURE_DATE=$(echo "$IOREG_DATA" | grep '"ManufactureDate" =' | awk '{print $3}' | tr -d '"')
+CYCLE_COUNT=$(echo "$IOREG_DATA" | /usr/bin/grep '"CycleCount" =' | /usr/bin/awk '{print $3}')
+MANUFACTURE_DATE=$(echo "$IOREG_DATA" | /usr/bin/grep '"ManufactureDate" =' | /usr/bin/awk '{print $3}' | tr -d '"')
 
 # Get health percent from system_profiler (this is the official system value)
-HEALTH_PERCENT=$(system_profiler SPPowerDataType | grep "Maximum Capacity" | awk '{print $3}' | tr -d '%')
+HEALTH_PERCENT=$(/usr/sbin/system_profiler SPPowerDataType | /usr/bin/grep "Maximum Capacity" | /usr/bin/awk '{print $3}' | tr -d '%')
 
 # Debug output
 echo "Debug info:"
@@ -56,7 +56,7 @@ echo "$JSON_PAYLOAD"
 echo ""
 
 # Send data to server
-RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+RESPONSE=$(/usr/bin/curl -s -w "\n%{http_code}" -X POST \
     -H "Content-Type: application/json" \
     -d "$JSON_PAYLOAD" \
     "${SERVER_URL}${ENDPOINT}")

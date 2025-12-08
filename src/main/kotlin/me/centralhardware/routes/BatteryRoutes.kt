@@ -19,7 +19,10 @@ fun Route.batteryRoutes(repository: BatteryRepository) {
                 dateTime = LocalDateTime.now(),
                 deviceId = request.deviceId,
                 cycleCount = request.cycleCount,
-                healthPercent = request.healthPercent
+                healthPercent = request.healthPercent,
+                currentCharge = request.currentCharge,
+                temperature = request.temperature,
+                isCharging = request.isCharging
             )
 
             repository.save(batteryHealth)

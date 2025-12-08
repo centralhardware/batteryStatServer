@@ -24,22 +24,31 @@ class BatteryRepository(clickhouseUrl: String) {
                         date_time,
                         device_id,
                         cycle_count,
-                        health_percent
+                        health_percent,
+                        current_charge,
+                        temperature,
+                        is_charging
                     ) VALUES (
                         toDateTime(?),
                         toString(?),
                         toUInt32(?),
+                        toUInt8(?),
+                        toUInt8(?),
+                        toInt16(?),
                         toUInt8(?)
                     )
                     """.trimIndent(),
                     Timestamp.valueOf(health.dateTime),
                     health.deviceId,
                     health.cycleCount,
-                    health.healthPercent
+                    health.healthPercent,
+                    health.currentCharge,
+                    health.temperature,
+                    if (health.isCharging) 1 else 0
                 ).asUpdate
             )
 
-            logger.info("Battery health saved: device=${health.deviceId}, cycles=${health.cycleCount}, health=${health.healthPercent}%")
+            logger.info("Battery health saved: device=${health.deviceId}, cycles=${health.cycleCount}, health=${health.healthPercent}%, charge=${health.currentCharge}%, temp=${health.temperature}°C, charging=${health.isCharging}")
         }
     }
 }

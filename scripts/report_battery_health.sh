@@ -21,6 +21,8 @@ TEMPERATURE=$(echo "$IOREG_DATA" | /usr/bin/grep '"Temperature" =' | /usr/bin/aw
 IS_CHARGING=$(echo "$IOREG_DATA" | /usr/bin/grep '"IsCharging" =' | /usr/bin/awk '{print $3}')
 DESIGN_CAPACITY_MAH=$(echo "$IOREG_DATA" | /usr/bin/grep '"DesignCapacity" =' | /usr/bin/awk '{print $3}')
 MAX_CAPACITY_MAH=$(echo "$IOREG_DATA" | /usr/bin/grep '"AppleRawMaxCapacity" =' | /usr/bin/awk '{print $3}')
+VOLTAGE=$(echo "$IOREG_DATA" | /usr/bin/grep '"Voltage" =' | /usr/bin/awk '{print $3}')
+CURRENT=$(echo "$IOREG_DATA" | /usr/bin/grep '"InstantAmperage" =' | /usr/bin/awk '{print $3}')
 
 # Get health percent from system_profiler (this is the official system value)
 HEALTH_PERCENT=$(/usr/sbin/system_profiler SPPowerDataType | /usr/bin/grep "Maximum Capacity" | /usr/bin/awk '{print $3}' | /usr/bin/tr -d '%')
@@ -46,6 +48,20 @@ else
     IS_CHARGING_BOOL="false"
 fi
 
+# Voltage is already in mV
+if [ -z "$VOLTAGE" ]; then
+    VOLTAGE=0
+fi
+
+# Convert InstantAmperage from unsigned to signed integer
+# ioreg returns negative values as large unsigned 64-bit numbers
+if [ -n "$CURRENT" ]; then
+    # Use Python to convert unsigned to signed int64
+    CURRENT=$(/usr/bin/python3 -c "import sys; val = $CURRENT; print(val if val <= 9223372036854775807 else val - 18446744073709551616)")
+else
+    CURRENT=0
+fi
+
 # Debug output
 echo "Debug info:"
 echo "  Device ID: $DEVICE_ID"
@@ -56,6 +72,8 @@ echo "  Temperature: ${TEMP_CELSIUS}°C"
 echo "  Is Charging: $IS_CHARGING_BOOL"
 echo "  Design Capacity: ${DESIGN_CAPACITY_MAH} mAh"
 echo "  Max Capacity: ${MAX_CAPACITY_MAH} mAh"
+echo "  Voltage: ${VOLTAGE} mV"
+echo "  Current: ${CURRENT} mA"
 
 # Validate data
 if [ -z "$CYCLE_COUNT" ] || [ -z "$HEALTH_PERCENT" ]; then
@@ -73,7 +91,9 @@ JSON_PAYLOAD=$(/bin/cat <<EOF
   "temperature": $TEMP_CELSIUS,
   "isCharging": $IS_CHARGING_BOOL,
   "designCapacityMah": ${DESIGN_CAPACITY_MAH:-0},
-  "maxCapacityMah": ${MAX_CAPACITY_MAH:-0}
+  "maxCapacityMah": ${MAX_CAPACITY_MAH:-0},
+  "voltageMv": ${VOLTAGE:-0},
+  "currentMa": ${CURRENT:-0}
 }
 EOF
 )
@@ -93,7 +113,7 @@ HTTP_CODE=$(echo "$RESPONSE" | /usr/bin/tail -n1)
 BODY=$(echo "$RESPONSE" | /usr/bin/sed '$d')
 
 if [ "$HTTP_CODE" = "201" ]; then
-    echo "$(/bin/date '+%Y-%m-%d %H:%M:%S') - Battery health reported successfully (Cycles: $CYCLE_COUNT, Health: ${HEALTH_PERCENT}%, Charge: ${CHARGE_PERCENT}%, Temp: ${TEMP_CELSIUS}°C, Charging: $IS_CHARGING_BOOL)"
+    echo "$(/bin/date '+%Y-%m-%d %H:%M:%S') - Battery health reported successfully (Cycles: $CYCLE_COUNT, Health: ${HEALTH_PERCENT}%, Charge: ${CHARGE_PERCENT}%, Temp: ${TEMP_CELSIUS}°C, Charging: $IS_CHARGING_BOOL, Voltage: ${VOLTAGE}mV, Current: ${CURRENT}mA)"
     exit 0
 else
     echo "$(/bin/date '+%Y-%m-%d %H:%M:%S') - Failed to report battery health. HTTP code: $HTTP_CODE"

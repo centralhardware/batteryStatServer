@@ -24,7 +24,9 @@ fun Route.batteryRoutes(repository: BatteryRepository) {
                 temperature = request.temperature,
                 isCharging = request.isCharging,
                 designCapacityMah = request.designCapacityMah,
-                maxCapacityMah = request.maxCapacityMah
+                maxCapacityMah = request.maxCapacityMah,
+                voltageMv = request.voltageMv,
+                currentMa = request.currentMa
             )
 
             repository.save(batteryHealth)

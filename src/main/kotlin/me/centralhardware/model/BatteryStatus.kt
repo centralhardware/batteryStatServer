@@ -12,7 +12,9 @@ data class BatteryHealthRequest(
     val temperature: Int,
     val isCharging: Boolean,
     val designCapacityMah: Int,
-    val maxCapacityMah: Int
+    val maxCapacityMah: Int,
+    val voltageMv: Int,
+    val currentMa: Int
 )
 
 data class BatteryHealth(
@@ -24,5 +26,7 @@ data class BatteryHealth(
     val temperature: Int,
     val isCharging: Boolean,
     val designCapacityMah: Int,
-    val maxCapacityMah: Int
+    val maxCapacityMah: Int,
+    val voltageMv: Int,
+    val currentMa: Int
 )

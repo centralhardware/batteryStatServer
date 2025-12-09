@@ -27,7 +27,9 @@ class BatteryRepository(clickhouseUrl: String) {
                         health_percent,
                         current_charge,
                         temperature,
-                        is_charging
+                        is_charging,
+                        design_capacity_mah,
+                        max_capacity_mah
                     ) VALUES (
                         toDateTime(?),
                         toString(?),
@@ -35,7 +37,9 @@ class BatteryRepository(clickhouseUrl: String) {
                         toUInt8(?),
                         toUInt8(?),
                         toInt16(?),
-                        toUInt8(?)
+                        toUInt8(?),
+                        toUInt16(?),
+                        toUInt16(?)
                     )
                     """.trimIndent(),
                     Timestamp.valueOf(health.dateTime),
@@ -44,7 +48,9 @@ class BatteryRepository(clickhouseUrl: String) {
                     health.healthPercent,
                     health.currentCharge,
                     health.temperature,
-                    if (health.isCharging) 1 else 0
+                    if (health.isCharging) 1 else 0,
+                    health.designCapacityMah,
+                    health.maxCapacityMah
                 ).asUpdate
             )
 

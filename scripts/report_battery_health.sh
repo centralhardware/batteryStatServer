@@ -19,6 +19,8 @@ CURRENT_CHARGE=$(echo "$IOREG_DATA" | /usr/bin/grep '"CurrentCapacity" =' | /usr
 MAX_CAPACITY=$(echo "$IOREG_DATA" | /usr/bin/grep '"MaxCapacity" =' | /usr/bin/awk '{print $3}')
 TEMPERATURE=$(echo "$IOREG_DATA" | /usr/bin/grep '"Temperature" =' | /usr/bin/awk '{print $3}')
 IS_CHARGING=$(echo "$IOREG_DATA" | /usr/bin/grep '"IsCharging" =' | /usr/bin/awk '{print $3}')
+DESIGN_CAPACITY_MAH=$(echo "$IOREG_DATA" | /usr/bin/grep '"DesignCapacity" =' | /usr/bin/awk '{print $3}')
+MAX_CAPACITY_MAH=$(echo "$IOREG_DATA" | /usr/bin/grep '"AppleRawMaxCapacity" =' | /usr/bin/awk '{print $3}')
 
 # Get health percent from system_profiler (this is the official system value)
 HEALTH_PERCENT=$(/usr/sbin/system_profiler SPPowerDataType | /usr/bin/grep "Maximum Capacity" | /usr/bin/awk '{print $3}' | /usr/bin/tr -d '%')
@@ -52,6 +54,8 @@ echo "  Health Percent: $HEALTH_PERCENT%"
 echo "  Current Charge: $CHARGE_PERCENT%"
 echo "  Temperature: ${TEMP_CELSIUS}°C"
 echo "  Is Charging: $IS_CHARGING_BOOL"
+echo "  Design Capacity: ${DESIGN_CAPACITY_MAH} mAh"
+echo "  Max Capacity: ${MAX_CAPACITY_MAH} mAh"
 
 # Validate data
 if [ -z "$CYCLE_COUNT" ] || [ -z "$HEALTH_PERCENT" ]; then
@@ -67,7 +71,9 @@ JSON_PAYLOAD=$(/bin/cat <<EOF
   "healthPercent": $HEALTH_PERCENT,
   "currentCharge": $CHARGE_PERCENT,
   "temperature": $TEMP_CELSIUS,
-  "isCharging": $IS_CHARGING_BOOL
+  "isCharging": $IS_CHARGING_BOOL,
+  "designCapacityMah": ${DESIGN_CAPACITY_MAH:-0},
+  "maxCapacityMah": ${MAX_CAPACITY_MAH:-0}
 }
 EOF
 )

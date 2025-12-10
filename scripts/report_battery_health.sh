@@ -4,7 +4,7 @@
 # This script collects battery health information and sends it to the server
 
 # Configuration
-SERVER_URL="${BATTERY_SERVER_URL:-http://10.168.0.77:8321}"
+SERVER_URL="${https//bs.centralhardware.me}"
 ENDPOINT="/api/battery/health"
 
 # Get device ID (hardware UUID)

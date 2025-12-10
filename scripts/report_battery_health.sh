@@ -108,7 +108,7 @@ HTTP_CODE=$(echo "$RESPONSE" | /usr/bin/tail -n1)
 BODY=$(echo "$RESPONSE" | /usr/bin/sed '$d')
 
 if [ "$HTTP_CODE" = "201" ]; then
-    echo "$(/bin/date '+%Y-%m-%d %H:%M:%S') - Battery health reported successfully (Cycles: $CYCLE_COUNT, Health: ${HEALTH_PERCENT}%, Charge: ${CHARGE_PERCENT}%, Temp: ${TEMP_CELSIUS}°C, Charging: $IS_CHARGING_BOOL, Voltage: ${VOLTAGE}mV, Current: ${CURRENT}mA)"
+    echo "$(/bin/date '+%Y-%m-%d %H:%M:%S') - Battery health reported successfully"
     exit 0
 else
     echo "$(/bin/date '+%Y-%m-%d %H:%M:%S') - Failed to report battery health. HTTP code: $HTTP_CODE"

@@ -98,11 +98,6 @@ JSON_PAYLOAD=$(/bin/cat <<EOF
 EOF
 )
 
-echo ""
-echo "JSON Payload:"
-echo "$JSON_PAYLOAD"
-echo ""
-
 # Send data to server
 RESPONSE=$(/usr/bin/curl -s -w "\n%{http_code}" -X POST \
     -H "Content-Type: application/json" \

@@ -38,7 +38,7 @@ class BatteryRepository(clickhouseUrl: String) {
                         toUInt32(?),
                         toUInt8(?),
                         toUInt8(?),
-                        toInt16(?),
+                        toFloat32(?),
                         toUInt8(?),
                         toUInt16(?),
                         toUInt16(?),

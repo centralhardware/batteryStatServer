@@ -36,7 +36,7 @@ fi
 
 # Convert temperature from centi-Celsius to Celsius (divide by 100)
 if [ -n "$TEMPERATURE" ]; then
-    TEMP_CELSIUS=$(echo "scale=0; $TEMPERATURE / 100" | /usr/bin/bc)
+    TEMP_CELSIUS=$(echo "scale=2; $TEMPERATURE / 100" | /usr/bin/bc)
 else
     TEMP_CELSIUS=0
 fi

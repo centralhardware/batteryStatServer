@@ -20,11 +20,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select Xcode version
-        run: sudo xcode-select -s /Applications/Xcode_15.2.app/Contents/Developer
+      - name: Show available Xcode versions
+        run: ls /Applications | grep Xcode
 
-      - name: Show Xcode version
+      - name: Show default Xcode version
         run: xcodebuild -version
+
+      - name: List available simulators
+        run: xcrun simctl list devices available
+
+      - name: Find available iPhone simulator
+        id: find-simulator
+        run: |
+          SIMULATOR=$(xcrun simctl list devices available iPhone | grep -m 1 "iPhone" | sed 's/.*(\(.*\)).*/\1/' || echo "")
+          if [ -z "$SIMULATOR" ]; then
+            echo "No iPhone simulator found, using generic iOS Simulator"
+            echo "destination=generic/platform=iOS Simulator" >> $GITHUB_OUTPUT
+          else
+            DEVICE_NAME=$(xcrun simctl list devices available iPhone | grep -m 1 "iPhone" | sed 's/ (.*//; s/^ *//')
+            echo "Found simulator: $DEVICE_NAME"
+            echo "destination=platform=iOS Simulator,name=$DEVICE_NAME" >> $GITHUB_OUTPUT
+          fi
 
       - name: Build iOS app
         working-directory: iosapp/BatteryMonitor
@@ -32,18 +48,22 @@ jobs:
           xcodebuild clean build \
             -project BatteryMonitor.xcodeproj \
             -scheme BatteryMonitor \
-            -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.2' \
+            -destination '${{ steps.find-simulator.outputs.destination }}' \
+            -allowProvisioningUpdates \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
+            CODE_SIGNING_ALLOWED=NO \
+            ONLY_ACTIVE_ARCH=NO
 
       - name: Run tests (if any)
         working-directory: iosapp/BatteryMonitor
+        continue-on-error: true
         run: |
           xcodebuild test \
             -project BatteryMonitor.xcodeproj \
             -scheme BatteryMonitor \
-            -destination 'platform=iOS Simulator,name=iPhone 15,OS=17.2' \
+            -destination '${{ steps.find-simulator.outputs.destination }}' \
+            -allowProvisioningUpdates \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO || echo "No tests found or tests failed - continuing"
+            CODE_SIGNING_ALLOWED=NO

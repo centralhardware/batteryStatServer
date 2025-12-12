@@ -14,7 +14,6 @@
 		1A000009 /* BatteryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A00000A /* BatteryService.swift */; };
 		1A00000B /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A00000C /* APIService.swift */; };
 		1A00000D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A00000E /* Assets.xcassets */; };
-		1A000022 /* IOKitBatteryInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A000023 /* IOKitBatteryInfo.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,9 +26,6 @@
 		1A00000E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1A00000F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1A000010 /* BatteryMonitor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BatteryMonitor.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		1A000023 /* IOKitBatteryInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IOKitBatteryInfo.m; sourceTree = "<group>"; };
-		1A000024 /* IOKitBatteryInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IOKitBatteryInfo.h; sourceTree = "<group>"; };
-		1A000025 /* BatteryMonitor-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "BatteryMonitor-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,7 +51,6 @@
 			isa = PBXGroup;
 			children = (
 				1A000002 /* BatteryMonitorApp.swift */,
-				1A000025 /* BatteryMonitor-Bridging-Header.h */,
 				1A000015 /* Views */,
 				1A000016 /* Models */,
 				1A000017 /* Services */,
@@ -95,8 +90,6 @@
 			children = (
 				1A00000A /* BatteryService.swift */,
 				1A00000C /* APIService.swift */,
-				1A000024 /* IOKitBatteryInfo.h */,
-				1A000023 /* IOKitBatteryInfo.m */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -176,7 +169,6 @@
 				1A000007 /* BatteryData.swift in Sources */,
 				1A000009 /* BatteryService.swift in Sources */,
 				1A00000B /* APIService.swift in Sources */,
-				1A000022 /* IOKitBatteryInfo.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -327,7 +319,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = me.centralhardware.BatteryMonitor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "BatteryMonitor/BatteryMonitor-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -359,7 +350,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = me.centralhardware.BatteryMonitor;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "BatteryMonitor/BatteryMonitor-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

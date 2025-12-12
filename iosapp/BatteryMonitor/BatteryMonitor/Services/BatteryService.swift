@@ -37,71 +37,31 @@ class BatteryService: ObservableObject {
         let level = device.batteryLevel
         let state = device.batteryState
 
-        // Получаем данные из IOKit
-        let iokitData = IOKitBatteryInfo.getBatteryInfo() ?? [:]
-
         // Базовые данные от UIDevice
         let isCharging = state == .charging || state == .full
 
-        // Текущий заряд в процентах из UIDevice (более надежно)
+        // Текущий заряд в процентах из UIDevice
         let currentCharge: Int
         if level >= 0 {
             currentCharge = Int(level * 100)
         } else {
-            // Если UIDevice не дал значение, пытаемся из IOKit
-            if let currentCap = iokitData["currentCapacity"] as? Int,
-               let maxCap = iokitData["maxCapacity"] as? Int,
-               maxCap > 0 {
-                currentCharge = (currentCap * 100) / maxCap
-            } else {
-                currentCharge = 0
-            }
+            currentCharge = 0
         }
 
-        // Cycle Count - только из IOKit, иначе 0
-        let cycleCount = iokitData["cycleCount"] as? Int ?? 0
-
-        // Design Capacity - из IOKit, иначе 0
-        let designCapacity = iokitData["designCapacity"] as? Int ?? 0
-
-        // Max Capacity - из IOKit, иначе 0
-        let maxCapacity = iokitData["maxCapacity"] as? Int ?? 0
-
-        // Health Percent - считаем на основе реальных данных
-        let healthPercent: Int
-        if designCapacity > 0 && maxCapacity > 0 {
-            healthPercent = min(100, (maxCapacity * 100) / designCapacity)
-        } else {
-            healthPercent = 0
-        }
-
-        // Температура - из IOKit если есть, иначе 0
-        // IOKit может давать температуру в сантиградусах (0.01 градуса)
-        let temperature: Float
-        if let temp = iokitData["temperature"] as? Int {
-            // Конвертируем из сантиградусов в градусы
-            temperature = Float(temp) / 100.0
-        } else {
-            temperature = 0.0
-        }
-
-        // Напряжение - из IOKit в милливольтах
-        let voltage: Int
-        if let voltageValue = iokitData["voltage"] as? Int {
-            // IOKit дает напряжение в милливольтах
-            voltage = voltageValue
-        } else {
-            voltage = 0
-        }
-
-        // Ток - из IOKit в миллиамперах
-        let current: Int
-        if let currentValue = iokitData["current"] as? Int {
-            // IOKit дает ток в миллиамперах (может быть отрицательным при разрядке)
-            current = currentValue
-        } else {
-            current = 0
-        }
+        // На iOS через публичные API недоступны:
+        // - cycle count
+        // - health
+        // - temperature
+        // - voltage
+        // - current
+        // Устанавливаем значения по умолчанию
+        let cycleCount = 0
+        let designCapacity = 0
+        let maxCapacity = 0
+        let healthPercent = 100 // Предполагаем 100% если нет данных
+        let temperature: Float = 0.0
+        let voltage = 0
+        let current = 0
 
         let batteryInfo = BatteryInfo(
             cycleCount: cycleCount,

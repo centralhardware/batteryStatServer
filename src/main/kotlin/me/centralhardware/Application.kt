@@ -23,7 +23,6 @@ fun main() {
     logger.info("Starting Battery Stats Server on port $port")
     logger.info("ClickHouse URL: $clickhouseUrl")
 
-    // Run Flyway migrations
     logger.info("Running database migrations...")
     val ds = DataSourceImpl(clickhouseUrl, Properties())
 

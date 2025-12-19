@@ -41,18 +41,18 @@ dependencies {
 }
 
 kotlin {
-    jvmToolchain(24)
+    jvmToolchain(25)
 }
 
 jib {
     from {
-        image = System.getenv("JIB_FROM_IMAGE") ?: "eclipse-temurin:24-jre"
+        image = System.getenv("JIB_FROM_IMAGE") ?: "eclipse-temurin:25-jre"
     }
     to {
     }
     container {
         mainClass = "me.centralhardware.ApplicationKt"
-        jvmFlags = listOf("-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0")
+        jvmFlags = listOf()
         creationTime = "USE_CURRENT_TIMESTAMP"
         labels = mapOf(
             "org.opencontainers.image.source" to (System.getenv("GITHUB_SERVER_URL")?.let { server ->

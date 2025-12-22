@@ -28,7 +28,7 @@ dependencies {
     implementation("com.github.seratch:kotliquery:1.9.1")
 
     // Flyway migrations
-    implementation("org.flywaydb:flyway-core:11.19.1")
+    implementation("org.flywaydb:flyway-core:11.20.0")
     implementation("org.flywaydb:flyway-database-clickhouse:10.24.0")
 
     // Logging

@@ -9,7 +9,6 @@ import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.routing.*
 import me.centralhardware.repository.BatteryRepository
 import me.centralhardware.routes.batteryRoutes
-import me.centralhardware.service.TelegramService
 import org.flywaydb.core.Flyway
 import org.slf4j.LoggerFactory
 import java.util.Properties
@@ -36,19 +35,18 @@ fun main() {
     logger.info("Database migrations completed")
 
     val repository = BatteryRepository(clickhouseUrl)
-    val telegramService = TelegramService()
 
     embeddedServer(Netty, port = port) {
-        module(repository, telegramService)
+        module(repository)
     }.start(wait = true)
 }
 
-fun Application.module(repository: BatteryRepository, telegramService: TelegramService) {
+fun Application.module(repository: BatteryRepository) {
     install(ContentNegotiation) {
         json()
     }
 
     routing {
-        batteryRoutes(repository, telegramService)
+        batteryRoutes(repository)
     }
 }

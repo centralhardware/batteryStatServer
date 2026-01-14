@@ -8,18 +8,12 @@ import io.ktor.server.routing.*
 import me.centralhardware.model.BatteryHealth
 import me.centralhardware.model.BatteryHealthRequest
 import me.centralhardware.repository.BatteryRepository
-import me.centralhardware.service.TelegramService
-import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 
-fun Route.batteryRoutes(repository: BatteryRepository, telegramService: TelegramService) {
-    val logger = LoggerFactory.getLogger("BatteryRoutes")
-
+fun Route.batteryRoutes(repository: BatteryRepository) {
     route("/api/battery") {
         post("/health") {
             val request = call.receive<BatteryHealthRequest>()
-
-            val lastCycleCount = repository.getLastCycleCount(request.deviceId)
 
             val batteryHealth = BatteryHealth(
                 dateTime = LocalDateTime.now(),
@@ -36,14 +30,6 @@ fun Route.batteryRoutes(repository: BatteryRepository, telegramService: Telegram
             )
 
             repository.save(batteryHealth)
-
-            if (lastCycleCount != null && request.cycleCount > lastCycleCount) {
-                logger.info("Cycle completed for device ${request.deviceId}: $lastCycleCount -> ${request.cycleCount}")
-                val stats = repository.getCycleStatistics(request.deviceId, lastCycleCount)
-                if (stats != null) {
-                    telegramService.sendCycleStatistics(stats)
-                }
-            }
 
             call.respond(HttpStatusCode.Created, mapOf("status" to "success"))
         }

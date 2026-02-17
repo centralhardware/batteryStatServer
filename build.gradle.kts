@@ -13,7 +13,7 @@ repositories {
 
 val ktorVersion = "3.4.0"
 val clickhouseVersion = "0.9.6"
-val logbackVersion = "1.5.29"
+val logbackVersion = "1.5.32"
 
 dependencies {
     // Ktor server

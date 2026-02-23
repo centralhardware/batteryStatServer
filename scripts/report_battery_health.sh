@@ -17,7 +17,9 @@ MAX_CAPACITY_MAH=$(echo "$IOREG_DATA" | /usr/bin/grep '"AppleRawMaxCapacity" =' 
 VOLTAGE=$(echo "$IOREG_DATA" | /usr/bin/grep '"Voltage" =' | /usr/bin/awk '{print $3}')
 CURRENT=$(echo "$IOREG_DATA" | /usr/bin/grep '"InstantAmperage" =' | /usr/bin/awk '{print $3}')
 AVG_TIME_TO_EMPTY=$(echo "$IOREG_DATA" | /usr/bin/grep '"AvgTimeToEmpty" =' | /usr/bin/awk '{print $3}')
+if [ "$AVG_TIME_TO_EMPTY" = "65535" ]; then AVG_TIME_TO_EMPTY=0; fi
 AVG_TIME_TO_FULL=$(echo "$IOREG_DATA" | /usr/bin/grep '"AvgTimeToFull" =' | /usr/bin/awk '{print $3}')
+if [ "$AVG_TIME_TO_FULL" = "65535" ]; then AVG_TIME_TO_FULL=0; fi
 EXTERNAL_CONNECTED=$(echo "$IOREG_DATA" | /usr/bin/grep '"ExternalConnected" =' | /usr/bin/awk '{print $3}')
 FULLY_CHARGED=$(echo "$IOREG_DATA" | /usr/bin/grep '"FullyCharged" =' | /usr/bin/awk '{print $3}')
 NOMINAL_CHARGE_CAPACITY=$(echo "$IOREG_DATA" | /usr/bin/grep '"NominalChargeCapacity" =' | /usr/bin/awk '{print $3}')
@@ -28,15 +30,17 @@ AT_CRITICAL_LEVEL=$(echo "$IOREG_DATA" | /usr/bin/grep '"AtCriticalLevel" =' | /
 BATTERY_CELL_DISCONNECT_COUNT=$(echo "$IOREG_DATA" | /usr/bin/grep '"BatteryCellDisconnectCount" =' | /usr/bin/awk '{print $3}')
 DESIGN_CYCLE_COUNT=$(echo "$IOREG_DATA" | /usr/bin/grep '"DesignCycleCount9C" =' | /usr/bin/awk '{print $3}')
 
-# Cell voltages from BatteryData
-CELL_VOLTAGE_1=$(echo "$IOREG_DATA" | /usr/bin/grep '"CellVoltage"' | /usr/bin/sed 's/.*(\(.*\))/\1/' | /usr/bin/awk -F',' '{print $1}')
-CELL_VOLTAGE_2=$(echo "$IOREG_DATA" | /usr/bin/grep '"CellVoltage"' | /usr/bin/sed 's/.*(\(.*\))/\1/' | /usr/bin/awk -F',' '{print $2}')
-CELL_VOLTAGE_3=$(echo "$IOREG_DATA" | /usr/bin/grep '"CellVoltage"' | /usr/bin/sed 's/.*(\(.*\))/\1/' | /usr/bin/awk -F',' '{print $3}')
+# Cell voltages from BatteryData (inline dict on one line)
+CELL_VOLTAGES=$(echo "$IOREG_DATA" | /usr/bin/sed -n 's/.*"CellVoltage"=(\([^)]*\)).*/\1/p')
+CELL_VOLTAGE_1=$(echo "$CELL_VOLTAGES" | /usr/bin/awk -F',' '{gsub(/ /,"",$1); print $1}')
+CELL_VOLTAGE_2=$(echo "$CELL_VOLTAGES" | /usr/bin/awk -F',' '{gsub(/ /,"",$2); print $2}')
+CELL_VOLTAGE_3=$(echo "$CELL_VOLTAGES" | /usr/bin/awk -F',' '{gsub(/ /,"",$3); print $3}')
 
-# Adapter details
-ADAPTER_WATTS=$(echo "$IOREG_DATA" | /usr/bin/grep '"AdapterDetails"' -A 20 | /usr/bin/grep '"Watts"' | /usr/bin/head -1 | /usr/bin/awk -F'=' '{print $2}' | /usr/bin/tr -d ' ,}')
-ADAPTER_NAME=$(echo "$IOREG_DATA" | /usr/bin/grep '"AdapterDetails"' -A 20 | /usr/bin/grep '"Name"' | /usr/bin/head -1 | /usr/bin/sed 's/.*"Name"="\(.*\)".*/\1/' | /usr/bin/sed 's/^ *//;s/ *$//')
-ADAPTER_VOLTAGE=$(echo "$IOREG_DATA" | /usr/bin/grep '"AdapterDetails"' -A 20 | /usr/bin/grep '"AdapterVoltage"' | /usr/bin/head -1 | /usr/bin/awk -F'=' '{print $2}' | /usr/bin/tr -d ' ,}')
+# Adapter details (inline dict on one line)
+ADAPTER_LINE=$(echo "$IOREG_DATA" | /usr/bin/grep '"AdapterDetails" =')
+ADAPTER_WATTS=$(echo "$ADAPTER_LINE" | /usr/bin/sed -n 's/.*"Watts"=\([0-9]*\).*/\1/p')
+ADAPTER_NAME=$(echo "$ADAPTER_LINE" | /usr/bin/sed -n 's/.*"Name"="\([^"]*\)".*/\1/p' | /usr/bin/sed 's/^ *//;s/ *$//')
+ADAPTER_VOLTAGE=$(echo "$ADAPTER_LINE" | /usr/bin/sed -n 's/.*"AdapterVoltage"=\([0-9]*\).*/\1/p')
 
 HEALTH_PERCENT=$(/usr/sbin/system_profiler SPPowerDataType | /usr/bin/grep "Maximum Capacity" | /usr/bin/awk '{print $3}' | /usr/bin/tr -d '%')
 

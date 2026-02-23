@@ -26,7 +26,24 @@ fun Route.batteryRoutes(repository: BatteryRepository) {
                 designCapacityMah = request.designCapacityMah,
                 maxCapacityMah = request.maxCapacityMah,
                 voltageMv = request.voltageMv,
-                currentMa = request.currentMa
+                currentMa = request.currentMa,
+                avgTimeToEmpty = request.avgTimeToEmpty,
+                avgTimeToFull = request.avgTimeToFull,
+                externalConnected = request.externalConnected,
+                fullyCharged = request.fullyCharged,
+                nominalChargeCapacity = request.nominalChargeCapacity,
+                rawCurrentCapacity = request.rawCurrentCapacity,
+                rawBatteryVoltage = request.rawBatteryVoltage,
+                virtualTemperature = request.virtualTemperature,
+                cellVoltage1 = request.cellVoltage1,
+                cellVoltage2 = request.cellVoltage2,
+                cellVoltage3 = request.cellVoltage3,
+                atCriticalLevel = request.atCriticalLevel,
+                batteryCellDisconnectCount = request.batteryCellDisconnectCount,
+                adapterWatts = request.adapterWatts,
+                adapterName = request.adapterName,
+                adapterVoltage = request.adapterVoltage,
+                designCycleCount = request.designCycleCount
             )
 
             repository.save(batteryHealth)

@@ -16,6 +16,27 @@ DESIGN_CAPACITY_MAH=$(echo "$IOREG_DATA" | /usr/bin/grep '"DesignCapacity" =' | 
 MAX_CAPACITY_MAH=$(echo "$IOREG_DATA" | /usr/bin/grep '"AppleRawMaxCapacity" =' | /usr/bin/awk '{print $3}')
 VOLTAGE=$(echo "$IOREG_DATA" | /usr/bin/grep '"Voltage" =' | /usr/bin/awk '{print $3}')
 CURRENT=$(echo "$IOREG_DATA" | /usr/bin/grep '"InstantAmperage" =' | /usr/bin/awk '{print $3}')
+AVG_TIME_TO_EMPTY=$(echo "$IOREG_DATA" | /usr/bin/grep '"AvgTimeToEmpty" =' | /usr/bin/awk '{print $3}')
+AVG_TIME_TO_FULL=$(echo "$IOREG_DATA" | /usr/bin/grep '"AvgTimeToFull" =' | /usr/bin/awk '{print $3}')
+EXTERNAL_CONNECTED=$(echo "$IOREG_DATA" | /usr/bin/grep '"ExternalConnected" =' | /usr/bin/awk '{print $3}')
+FULLY_CHARGED=$(echo "$IOREG_DATA" | /usr/bin/grep '"FullyCharged" =' | /usr/bin/awk '{print $3}')
+NOMINAL_CHARGE_CAPACITY=$(echo "$IOREG_DATA" | /usr/bin/grep '"NominalChargeCapacity" =' | /usr/bin/awk '{print $3}')
+RAW_CURRENT_CAPACITY=$(echo "$IOREG_DATA" | /usr/bin/grep '"AppleRawCurrentCapacity" =' | /usr/bin/awk '{print $3}')
+RAW_BATTERY_VOLTAGE=$(echo "$IOREG_DATA" | /usr/bin/grep '"AppleRawBatteryVoltage" =' | /usr/bin/awk '{print $3}')
+VIRTUAL_TEMPERATURE=$(echo "$IOREG_DATA" | /usr/bin/grep '"VirtualTemperature" =' | /usr/bin/awk '{print $3}')
+AT_CRITICAL_LEVEL=$(echo "$IOREG_DATA" | /usr/bin/grep '"AtCriticalLevel" =' | /usr/bin/awk '{print $3}')
+BATTERY_CELL_DISCONNECT_COUNT=$(echo "$IOREG_DATA" | /usr/bin/grep '"BatteryCellDisconnectCount" =' | /usr/bin/awk '{print $3}')
+DESIGN_CYCLE_COUNT=$(echo "$IOREG_DATA" | /usr/bin/grep '"DesignCycleCount9C" =' | /usr/bin/awk '{print $3}')
+
+# Cell voltages from BatteryData
+CELL_VOLTAGE_1=$(echo "$IOREG_DATA" | /usr/bin/grep '"CellVoltage"' | /usr/bin/sed 's/.*(\(.*\))/\1/' | /usr/bin/awk -F',' '{print $1}')
+CELL_VOLTAGE_2=$(echo "$IOREG_DATA" | /usr/bin/grep '"CellVoltage"' | /usr/bin/sed 's/.*(\(.*\))/\1/' | /usr/bin/awk -F',' '{print $2}')
+CELL_VOLTAGE_3=$(echo "$IOREG_DATA" | /usr/bin/grep '"CellVoltage"' | /usr/bin/sed 's/.*(\(.*\))/\1/' | /usr/bin/awk -F',' '{print $3}')
+
+# Adapter details
+ADAPTER_WATTS=$(echo "$IOREG_DATA" | /usr/bin/grep '"AdapterDetails"' -A 20 | /usr/bin/grep '"Watts"' | /usr/bin/head -1 | /usr/bin/awk -F'=' '{print $2}' | /usr/bin/tr -d ' ,}')
+ADAPTER_NAME=$(echo "$IOREG_DATA" | /usr/bin/grep '"AdapterDetails"' -A 20 | /usr/bin/grep '"Name"' | /usr/bin/head -1 | /usr/bin/sed 's/.*"Name"="\(.*\)".*/\1/' | /usr/bin/sed 's/^ *//;s/ *$//')
+ADAPTER_VOLTAGE=$(echo "$IOREG_DATA" | /usr/bin/grep '"AdapterDetails"' -A 20 | /usr/bin/grep '"AdapterVoltage"' | /usr/bin/head -1 | /usr/bin/awk -F'=' '{print $2}' | /usr/bin/tr -d ' ,}')
 
 HEALTH_PERCENT=$(/usr/sbin/system_profiler SPPowerDataType | /usr/bin/grep "Maximum Capacity" | /usr/bin/awk '{print $3}' | /usr/bin/tr -d '%')
 
@@ -31,10 +52,34 @@ else
     TEMP_CELSIUS=0
 fi
 
+if [ -n "$VIRTUAL_TEMPERATURE" ]; then
+    VIRTUAL_TEMP_CELSIUS=$(echo "scale=2; $VIRTUAL_TEMPERATURE / 100" | /usr/bin/bc)
+else
+    VIRTUAL_TEMP_CELSIUS=0
+fi
+
 if [ "$IS_CHARGING" = "Yes" ]; then
     IS_CHARGING_BOOL="true"
 else
     IS_CHARGING_BOOL="false"
+fi
+
+if [ "$EXTERNAL_CONNECTED" = "Yes" ]; then
+    EXTERNAL_CONNECTED_BOOL="true"
+else
+    EXTERNAL_CONNECTED_BOOL="false"
+fi
+
+if [ "$FULLY_CHARGED" = "Yes" ]; then
+    FULLY_CHARGED_BOOL="true"
+else
+    FULLY_CHARGED_BOOL="false"
+fi
+
+if [ "$AT_CRITICAL_LEVEL" = "Yes" ]; then
+    AT_CRITICAL_LEVEL_BOOL="true"
+else
+    AT_CRITICAL_LEVEL_BOOL="false"
 fi
 
 # Voltage is already in mV
@@ -59,6 +104,21 @@ echo "  Design Capacity: ${DESIGN_CAPACITY_MAH} mAh"
 echo "  Max Capacity: ${MAX_CAPACITY_MAH} mAh"
 echo "  Voltage: ${VOLTAGE} mV"
 echo "  Current: ${CURRENT} mA"
+echo "  Avg Time To Empty: ${AVG_TIME_TO_EMPTY:-0} min"
+echo "  Avg Time To Full: ${AVG_TIME_TO_FULL:-0} min"
+echo "  External Connected: $EXTERNAL_CONNECTED_BOOL"
+echo "  Fully Charged: $FULLY_CHARGED_BOOL"
+echo "  Nominal Charge Capacity: ${NOMINAL_CHARGE_CAPACITY:-0} mAh"
+echo "  Raw Current Capacity: ${RAW_CURRENT_CAPACITY:-0} mAh"
+echo "  Raw Battery Voltage: ${RAW_BATTERY_VOLTAGE:-0} mV"
+echo "  Virtual Temperature: ${VIRTUAL_TEMP_CELSIUS}°C"
+echo "  Cell Voltages: ${CELL_VOLTAGE_1:-0}, ${CELL_VOLTAGE_2:-0}, ${CELL_VOLTAGE_3:-0} mV"
+echo "  At Critical Level: $AT_CRITICAL_LEVEL_BOOL"
+echo "  Cell Disconnect Count: ${BATTERY_CELL_DISCONNECT_COUNT:-0}"
+echo "  Adapter Watts: ${ADAPTER_WATTS:-0} W"
+echo "  Adapter Name: ${ADAPTER_NAME:-}"
+echo "  Adapter Voltage: ${ADAPTER_VOLTAGE:-0} mV"
+echo "  Design Cycle Count: ${DESIGN_CYCLE_COUNT:-0}"
 
 if [ -z "$CYCLE_COUNT" ] || [ -z "$HEALTH_PERCENT" ]; then
     echo "$(/bin/date '+%Y-%m-%d %H:%M:%S') - Error: Failed to get battery information"
@@ -76,7 +136,24 @@ JSON_PAYLOAD=$(/bin/cat <<EOF
   "designCapacityMah": ${DESIGN_CAPACITY_MAH:-0},
   "maxCapacityMah": ${MAX_CAPACITY_MAH:-0},
   "voltageMv": ${VOLTAGE:-0},
-  "currentMa": ${CURRENT:-0}
+  "currentMa": ${CURRENT:-0},
+  "avgTimeToEmpty": ${AVG_TIME_TO_EMPTY:-0},
+  "avgTimeToFull": ${AVG_TIME_TO_FULL:-0},
+  "externalConnected": $EXTERNAL_CONNECTED_BOOL,
+  "fullyCharged": $FULLY_CHARGED_BOOL,
+  "nominalChargeCapacity": ${NOMINAL_CHARGE_CAPACITY:-0},
+  "rawCurrentCapacity": ${RAW_CURRENT_CAPACITY:-0},
+  "rawBatteryVoltage": ${RAW_BATTERY_VOLTAGE:-0},
+  "virtualTemperature": $VIRTUAL_TEMP_CELSIUS,
+  "cellVoltage1": ${CELL_VOLTAGE_1:-0},
+  "cellVoltage2": ${CELL_VOLTAGE_2:-0},
+  "cellVoltage3": ${CELL_VOLTAGE_3:-0},
+  "atCriticalLevel": $AT_CRITICAL_LEVEL_BOOL,
+  "batteryCellDisconnectCount": ${BATTERY_CELL_DISCONNECT_COUNT:-0},
+  "adapterWatts": ${ADAPTER_WATTS:-0},
+  "adapterName": "${ADAPTER_NAME:-}",
+  "adapterVoltage": ${ADAPTER_VOLTAGE:-0},
+  "designCycleCount": ${DESIGN_CYCLE_COUNT:-0}
 }
 EOF
 )

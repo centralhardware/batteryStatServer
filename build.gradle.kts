@@ -11,7 +11,7 @@ repositories {
     mavenCentral()
 }
 
-val ktorVersion = "3.4.0"
+val ktorVersion = "3.4.1"
 val clickhouseVersion = "0.9.7"
 val logbackVersion = "1.5.32"
 

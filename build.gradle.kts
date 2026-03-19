@@ -12,7 +12,7 @@ repositories {
 }
 
 val ktorVersion = "3.4.1"
-val clickhouseVersion = "0.9.7"
+val clickhouseVersion = "0.9.8"
 val logbackVersion = "1.5.32"
 
 dependencies {
